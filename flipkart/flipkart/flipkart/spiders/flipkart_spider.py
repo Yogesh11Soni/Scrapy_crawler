@@ -26,13 +26,16 @@ class FlipkartSpiderSpider(scrapy.Spider):
         for link in link_elements:
             href = link.get_attribute("href")
             yield scrapy.Request(href)
+        len(link, '*'*50)
+        len(link_elements, '*'*50)
         driver.quit()
         
     def parse(self, response):
         items = FlipkartItem()
         items['book_name'] = response.css('.B_NuCI::text').extract()
         items['price'] = response.css('._16Jk6d::text').extract()
-        text = response.css('._21Ahn-:nth-child(6)::text').get()
-        items['pages'] = re.search(r'pages: (\d+)', text)
+        text = response.xpath('//*[contains(text(), "Pages:")]').get()
+        items['pages'] = re.search(r'\d+', text).group()
+
 
         yield items 
